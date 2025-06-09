@@ -1,4 +1,4 @@
-package assets;
+package shared;
 
 public class FilePiece {
     private String name;

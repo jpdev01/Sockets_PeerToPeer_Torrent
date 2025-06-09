@@ -1,6 +1,6 @@
 package tracker;
 
-import assets.Message;
+import shared.Message;
 
 import java.net.*;
 import java.io.*;

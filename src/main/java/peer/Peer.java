@@ -1,6 +1,6 @@
 package peer;
 
-import assets.Message;
+import shared.Message;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
