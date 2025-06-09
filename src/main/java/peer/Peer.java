@@ -2,13 +2,6 @@ package peer;
 
 import shared.Message;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -19,11 +12,13 @@ public class Peer {
     private final int trackerPort = 8888;
     private final String trackerHost = "localhost";
     private final PeerTCPHandler tcpHandler;
+    private final UDPHandler udpHandler;
 
     public Peer(String id, List<String> pieces) {
         this.id = id;
         this.myPieces = new ArrayList<>(pieces);
         this.tcpHandler = new PeerTCPHandler(id, myPieces);
+        this.udpHandler = new UDPHandler(trackerHost, trackerPort);
     }
 
     public void start() throws Exception {
@@ -34,7 +29,7 @@ public class Peer {
 
     private void requestPeers() throws Exception {
         Message request = new Message(Message.Type.REQUEST_PEERS, id, null);
-        Message response = sendUDP(request, true);
+        Message response = udpHandler.send(request, true);
         System.out.println("[Peer] Lista de pares recebida:");
 
         List<String> peerList = response.pieces;
@@ -79,37 +74,12 @@ public class Peer {
             public void run() {
                 try {
                     Message update = new Message(Message.Type.FILE_UPDATE, id, myPieces);
-                    sendUDP(update, false);
+                    udpHandler.send(update, false);
                     System.out.println("[Peer] Lista de pedaços enviada ao tracker.");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }, 0, TimeUnit.SECONDS.toMillis(3));
-    }
-
-    private Message sendUDP(Message message, boolean expectResponse) throws Exception {
-        DatagramSocket socket = new DatagramSocket();
-        InetAddress trackerAddr = InetAddress.getByName(trackerHost);
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(message);
-        byte[] data = baos.toByteArray();
-
-        DatagramPacket packet = new DatagramPacket(data, data.length, trackerAddr, trackerPort);
-        socket.send(packet);
-
-        if (expectResponse) {
-            byte[] buffer = new byte[8192];
-            DatagramPacket responsePacket = new DatagramPacket(buffer, buffer.length);
-            socket.receive(responsePacket);
-
-            ByteArrayInputStream bais = new ByteArrayInputStream(responsePacket.getData());
-            ObjectInputStream ois = new ObjectInputStream(bais);
-            return (Message) ois.readObject();
-        }
-
-        return null; // Sem resposta esperada
     }
 }
