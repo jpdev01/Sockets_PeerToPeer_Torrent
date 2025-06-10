@@ -12,6 +12,8 @@ public class Tracker {
     private static final Map<String, List<String>> peerFileMap = new ConcurrentHashMap<>();
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
+        TrackerPeerPurge.startInactivePeerChecker();
+
         DatagramSocket socket = new DatagramSocket(PORT);
         System.out.println("[Tracker] Iniciado na porta " + PORT);
 
@@ -26,6 +28,13 @@ public class Tracker {
                 System.err.println("[Tracker] Erro ao processar pacote: " + e.getMessage());
                 e.printStackTrace();
             }
+        }
+    }
+
+    public static void removePeer(String peerId) {
+        if (peerFileMap.containsKey(peerId)) {
+            peerFileMap.remove(peerId);
+            System.out.println("[Tracker] Peer removido: " + peerId);
         }
     }
 
@@ -65,6 +74,7 @@ public class Tracker {
     }
 
     private static void handleFileUpdate(String peerId, Message msg) {
+        TrackerPeerPurge.store(peerId);
         if (msg.pieces == null || msg.pieces.isEmpty()) {
             System.out.println("[Tracker] Atualização ignorada: lista de pedaços vazia para " + msg.peerAddress);
             return;
