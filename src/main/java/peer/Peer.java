@@ -3,6 +3,8 @@ package peer;
 import shared.Message;
 
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Peer {
@@ -23,8 +25,19 @@ public class Peer {
 
     public void start() throws Exception {
         tcpHandler.startTCPServer(); // Inicia o servidor TCP
-        requestPeers();
+        startRequestPeersScheduler();
         startFileUpdateThread();
+    }
+
+    private void startRequestPeersScheduler() {
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(() -> {
+            try {
+                requestPeers();
+            } catch (Exception e) {
+                System.err.println("[Peer] Erro ao solicitar peers: " + e.getMessage());
+            }
+        }, 0, 3, TimeUnit.SECONDS);
     }
 
     private void requestPeers() throws Exception {
@@ -37,14 +50,17 @@ public class Peer {
             System.out.println(" → " + entry);
         }
 
-        // Lógica para identificar o pedaço mais raro
+        // Lógica para identificar o pedaço mais raro e o peer correspondente
         Map<String, Integer> pieceFreq = new HashMap<>();
+        Map<String, String> pieceToPeer = new HashMap<>();
         for (String entry : peerList) {
             String[] parts = entry.split("\\|");
             if (parts.length < 2) continue;
+            String peerAddress = parts[0];
             String[] pieces = parts[1].split(",");
             for (String p : pieces) {
                 pieceFreq.put(p, pieceFreq.getOrDefault(p, 0) + 1);
+                pieceToPeer.putIfAbsent(p, peerAddress);
             }
         }
 
@@ -54,11 +70,13 @@ public class Peer {
                 .map(Map.Entry::getKey)
                 .orElse(null);
 
+        String rarestPeer = rarest != null ? pieceToPeer.get(rarest) : null;
+
         if (rarest != null) {
             System.out.println("[Peer] Pedaço mais raro: " + rarest);
 
             // Solicita o pedaço mais raro ao primeiro peer
-            tcpHandler.requestPieceFromPeer(peerList.get(0).split("\\|")[0], rarest);
+            tcpHandler.requestPieceFromPeer(rarestPeer, rarest);
 
             // Escolhe aleatoriamente outro peer
             String randomPeer = peerList.get((int) (Math.random() * peerList.size())).split("\\|")[0];
