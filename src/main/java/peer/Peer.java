@@ -10,7 +10,7 @@ public class Peer {
     private String id;
     private ArrayList<String> myPieces;
     private final int trackerPort = 8888;
-    private final String trackerHost = "localhost";
+    private final String trackerHost = "localhost"; // IP DO TRACKER
     private final PeerTCPHandler tcpHandler;
     private final UDPHandler udpHandler;
 
