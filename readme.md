@@ -9,9 +9,9 @@ mvn clean install
 
 Para executar um Peer
 ```bash
-java -cp target/<NOME_DO_JAR>.jar peer.Main <PEER_ID> <PEDACOS>
+java -cp target/<NOME_DO_JAR>.jar peer.Main <TCP_PORT> <PEDACOS>
 ```
 Exemplo:
 ```bash
-java -cp target/Sockets_PeerToPeer_Torrent-1.0-SNAPSHOT.jar peer.Main 127.0.0.1:5001 1.txt 2.txt
+java -cp target/Sockets_PeerToPeer_Torrent-1.0-SNAPSHOT.jar peer.Main 5001 1.txt 2.txt
 ```
