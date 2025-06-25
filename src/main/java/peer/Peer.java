@@ -53,7 +53,7 @@ public class Peer {
         }
 
         // Lógica para identificar o pedaço mais raro e o peer correspondente
-        Map<String, Integer> pieceFreq = new HashMap<>();
+        Map<String, Integer> pieceFrequency = new HashMap<>();
         Map<String, String> pieceToPeer = new HashMap<>();
         for (String entry : peerList) {
             String[] parts = entry.split("\\|");
@@ -61,12 +61,12 @@ public class Peer {
             String peerAddress = parts[0];
             String[] pieces = parts[1].split(",");
             for (String p : pieces) {
-                pieceFreq.put(p, pieceFreq.getOrDefault(p, 0) + 1);
+                pieceFrequency.put(p, pieceFrequency.getOrDefault(p, 0) + 1);
                 pieceToPeer.putIfAbsent(p, peerAddress);
             }
         }
 
-        String rarest = pieceFreq.entrySet().stream()
+        String rarest = pieceFrequency.entrySet().stream()
                 .filter(e -> !myPieces.contains(e.getKey()))
                 .min(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)

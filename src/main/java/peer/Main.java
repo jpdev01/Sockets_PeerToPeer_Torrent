@@ -1,13 +1,6 @@
 package peer;
 
-import shared.FilePiece;
-
-import java.io.FileOutputStream;
 import java.net.Inet4Address;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
 
 public class Main {
 

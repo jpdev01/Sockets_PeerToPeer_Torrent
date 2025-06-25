@@ -20,10 +20,6 @@ public class UDPHandler {
         this.port = port;
     }
 
-    public void send(Message message) throws Exception {
-        send(message, false);
-    }
-
     public Message send(Message message, boolean expectResponse) throws Exception {
         DatagramSocket socket = new DatagramSocket();
         InetAddress address = InetAddress.getByName(host);

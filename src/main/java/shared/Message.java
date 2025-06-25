@@ -11,27 +11,27 @@ public class Message implements Serializable {
     }
 
     public Type type;
-    public String peerAddress;
+    public String peerTcpAddress;
     public FilePiece sharedFilePiece;
     public List<String> pieces;
     public String requestedPiece;
 
     public Message(Type type, String peerAddress, List<String> pieces, String requestedPiece) {
         this.type = type;
-        this.peerAddress = peerAddress;
+        this.peerTcpAddress = peerAddress;
         this.pieces = pieces;
         this.requestedPiece = requestedPiece;
     }
 
     public Message(Type type, String peerAddress, List<String> pieces) {
         this.type = type;
-        this.peerAddress = peerAddress;
+        this.peerTcpAddress = peerAddress;
         this.pieces = pieces;
     }
 
     public Message(Type type, String peerAddress, List<String> pieces, FilePiece sharedFilePiece) {
         this.type = type;
-        this.peerAddress = peerAddress;
+        this.peerTcpAddress = peerAddress;
         this.pieces = pieces;
         this.sharedFilePiece = sharedFilePiece;
     }

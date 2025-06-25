@@ -46,19 +46,19 @@ public class Tracker {
         String peerId = packet.getAddress().getHostAddress() + ":" + packet.getPort();
 
         switch (msg.type) {
-            case REQUEST_PEERS -> handleRequestPeers(peerId, socket, packet);
+            case REQUEST_PEERS -> handleRequestPeers(peerId, msg, socket, packet);
             case FILE_UPDATE -> handleFileUpdate(peerId, msg);
             default -> System.out.println("[Tracker] Tipo de mensagem desconhecido: " + msg.type);
         }
     }
 
-    private static void handleRequestPeers(String peerId, DatagramSocket socket, DatagramPacket packet) throws IOException {
+    private static void handleRequestPeers(String peerId, Message message, DatagramSocket socket, DatagramPacket packet) throws IOException {
         System.out.println("[Tracker] Enviando lista de peers para " + peerId);
 
         Message response = new Message(Message.Type.PEER_LIST, null, null);
         List<String> list = new ArrayList<>();
         for (Map.Entry<String, List<String>> entry : peerFileMap.entrySet()) {
-            if (entry.getKey().equals(peerId)) {
+            if (entry.getKey().equals(message.peerTcpAddress)) {
                 continue; // Ignora o próprio peer
             }
             list.add(entry.getKey() + "|" + String.join(",", entry.getValue()));
@@ -79,11 +79,11 @@ public class Tracker {
     private static void handleFileUpdate(String peerId, Message msg) {
         TrackerPeerPurge.store(peerId);
         if (msg.pieces == null || msg.pieces.isEmpty()) {
-            System.out.println("[Tracker] Atualização ignorada: lista de pedaços vazia para " + msg.peerAddress);
+            System.out.println("[Tracker] Atualização ignorada: lista de pedaços vazia para " + msg.peerTcpAddress);
             return;
         }
 
-        peerFileMap.put(msg.peerAddress, new ArrayList<>(msg.pieces));
-        System.out.println("[Tracker] Atualizado: " + msg.peerAddress + " com pedaços " + msg.pieces);
+        peerFileMap.put(msg.peerTcpAddress, new ArrayList<>(msg.pieces));
+        System.out.println("[Tracker] Atualizado: " + msg.peerTcpAddress + " com pedaços " + msg.pieces);
     }
 }
