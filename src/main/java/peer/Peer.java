@@ -10,14 +10,16 @@ import java.util.concurrent.TimeUnit;
 public class Peer {
 
     private String tcpAddress;
-    private ArrayList<String> myPieces;
+     //private ArrayList<String> myPieces;
+    private final FileManager fileManager;
     private final TCPHandler tcpHandler;
     private final UDPHandler udpHandler;
 
     public Peer(String id, String folderName) {
         this.tcpAddress = id;
-        this.myPieces = new ArrayList<>(Objects.requireNonNull(FileManager.loadPieceNames(folderName)));
-        this.tcpHandler = new TCPHandler(id, folderName, myPieces);
+        // this.myPieces = new ArrayList<>(Objects.requireNonNull(FileManager.loadPieceNames(folderName)));
+        this.fileManager = new FileManager(folderName);
+        this.tcpHandler = new TCPHandler(id, fileManager);
         this.udpHandler = new UDPHandler();
     }
 
@@ -63,7 +65,7 @@ public class Peer {
         }
 
         String rarest = pieceFrequency.entrySet().stream()
-                .filter(e -> !myPieces.contains(e.getKey()))
+                .filter(e -> !fileManager.loadPieceNames().contains(e.getKey()))
                 .min(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
                 .orElse(null);
@@ -73,7 +75,7 @@ public class Peer {
         if (rarest != null) {
             System.out.println("[Peer] Pedaço mais raro: " + rarest);
 
-            // Solicita o pedaço mais raro ao primeiro peer
+            // Solicita o pedaço mais raro ao peer
             tcpHandler.requestPieceFromPeer(rarestPeer, rarest);
 
             // Escolhe aleatoriamente outro peer
@@ -88,7 +90,7 @@ public class Peer {
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(() -> {
             try {
-                Message update = new Message(Message.Type.FILE_UPDATE, tcpAddress, myPieces);
+                Message update = new Message(Message.Type.FILE_UPDATE, tcpAddress, fileManager.loadPieceNames());
                 udpHandler.send(update, false);
                 System.out.println("[Peer] Lista de pedaços enviada ao tracker.");
             } catch (Exception e) {

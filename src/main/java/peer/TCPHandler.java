@@ -10,13 +10,11 @@ import java.util.List;
 public class TCPHandler {
 
     private final String peerTcpAddress;
-    private final List<String> myPieces;
-    private final String folderName;
+    private final FileManager fileManager;
 
-    public TCPHandler(String peerId, String folderName, List<String> myPieces) {
+    public TCPHandler(String peerId, FileManager fileManager) {
         this.peerTcpAddress = peerId;
-        this.myPieces = myPieces;
-        this.folderName = folderName;
+        this.fileManager = fileManager;
     }
 
     public void startTCPServer() {
@@ -34,11 +32,11 @@ public class TCPHandler {
                         System.out.println("[TCPHandler] Solicitação recebida: " + request.requestedPiece + " de " + request.peerTcpAddress);
                         if (request.type == Message.Type.REQUEST_PIECE) {
                             String requestedPiece = request.requestedPiece;
-                            if (myPieces.contains(requestedPiece)) {
+                            if (fileManager.loadPieceNames().contains(requestedPiece)) {
 
                                 System.out.println("[TCPHandler] Enviando pedaço " + requestedPiece + " para " + request.peerTcpAddress);
 
-                                FilePiece requestedFilePiece = FileManager.readFileFromDisk(folderName, requestedPiece);
+                                FilePiece requestedFilePiece = fileManager.readFileFromDisk(requestedPiece);
                                 Message message = new Message(Message.Type.SEND_PIECE, peerTcpAddress, null, requestedFilePiece);
                                 out.writeObject(message);
                                 System.out.println("[TCPHandler] Pedaço " + requestedPiece + " enviado com sucesso.");
@@ -71,8 +69,8 @@ public class TCPHandler {
             Message response = (Message) in.readObject();
             if (response.type == Message.Type.SEND_PIECE) {
                 System.out.println("[TCPHandler] Pedaço " + piece + " recebido de " + peerInfo);
-                FileManager.saveFile(folderName, response.sharedFilePiece);
-                myPieces.add(response.sharedFilePiece.getName());
+                fileManager.saveFile(response.sharedFilePiece);
+                // myPieces.add(response.sharedFilePiece.getName());
             }
         } catch (Exception e) {
             System.err.println("[TCPHandler] Erro ao solicitar pedaço de " + peerInfo + ": " + e.getMessage());

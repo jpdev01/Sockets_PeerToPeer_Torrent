@@ -12,7 +12,13 @@ import java.util.List;
 
 public class FileManager {
 
-    public static List<String> loadPieceNames(String folderName) {
+    private final String folderName;
+
+    public FileManager(String folderName) {
+        this.folderName = folderName;
+    }
+
+    public List<String> loadPieceNames() {
         List<String> pieceList = new ArrayList<>();
         try {
             File folder = new File(folderName);
@@ -32,7 +38,7 @@ public class FileManager {
         }
     }
 
-    public static FilePiece readFileFromDisk(String folderName, String fileName) throws IOException {
+    public FilePiece readFileFromDisk(String fileName) throws IOException {
         File file = new File(folderName + "/" + fileName);
         byte[] content = new byte[(int) file.length()];
         try (FileInputStream fis = new FileInputStream(file)) {
@@ -41,7 +47,7 @@ public class FileManager {
         return new FilePiece(fileName, content);
     }
 
-    public static void saveFile(String folderName, FilePiece filePiece) throws IOException {
+    public void saveFile(FilePiece filePiece) throws IOException {
         try (FileOutputStream fos = new FileOutputStream(folderName + "/" + filePiece.getName())) {
             fos.write(filePiece.getContent());
         }
