@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Peer {
 
-    private String id;
+    private String tcpAddress;
     private ArrayList<String> myPieces;
     private final int trackerPort = 8888;
     private final String trackerHost = "localhost"; // IP DO TRACKER
@@ -18,7 +18,7 @@ public class Peer {
     private final String folderName;
 
     public Peer(String id, String folderName) {
-        this.id = id;
+        this.tcpAddress = id;
         this.myPieces = new ArrayList<>(Objects.requireNonNull(FileManager.loadPieceNames(folderName)));
         this.folderName = folderName;
         this.tcpHandler = new TCPHandler(id, this.folderName, myPieces);
@@ -43,7 +43,7 @@ public class Peer {
     }
 
     private void requestPeers() throws Exception {
-        Message request = new Message(Message.Type.REQUEST_PEERS, id, null);
+        Message request = new Message(Message.Type.REQUEST_PEERS, tcpAddress, null);
         Message response = udpHandler.send(request, true);
         System.out.println("[Peer] Lista de pares recebida:");
 
@@ -92,7 +92,7 @@ public class Peer {
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(() -> {
             try {
-                Message update = new Message(Message.Type.FILE_UPDATE, id, myPieces);
+                Message update = new Message(Message.Type.FILE_UPDATE, tcpAddress, myPieces);
                 udpHandler.send(update, false);
                 System.out.println("[Peer] Lista de pedaços enviada ao tracker.");
             } catch (Exception e) {
