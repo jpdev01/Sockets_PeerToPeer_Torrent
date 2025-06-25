@@ -15,9 +15,9 @@ public class UDPHandler {
     private final String host;
     private final int port;
 
-    public UDPHandler(String host, int port) {
-        this.host = host;
-        this.port = port;
+    public UDPHandler() {
+        this.host = TrackerConstants.HOST;
+        this.port = TrackerConstants.PORT;
     }
 
     public Message send(Message message, boolean expectResponse) throws Exception {

@@ -11,18 +11,14 @@ public class Peer {
 
     private String tcpAddress;
     private ArrayList<String> myPieces;
-    private final int trackerPort = 8888;
-    private final String trackerHost = "localhost"; // IP DO TRACKER
     private final TCPHandler tcpHandler;
     private final UDPHandler udpHandler;
-    private final String folderName;
 
     public Peer(String id, String folderName) {
         this.tcpAddress = id;
         this.myPieces = new ArrayList<>(Objects.requireNonNull(FileManager.loadPieceNames(folderName)));
-        this.folderName = folderName;
-        this.tcpHandler = new TCPHandler(id, this.folderName, myPieces);
-        this.udpHandler = new UDPHandler(trackerHost, trackerPort);
+        this.tcpHandler = new TCPHandler(id, folderName, myPieces);
+        this.udpHandler = new UDPHandler();
     }
 
     public void start() throws Exception {
