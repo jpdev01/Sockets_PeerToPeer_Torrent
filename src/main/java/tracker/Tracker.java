@@ -58,6 +58,9 @@ public class Tracker {
         Message response = new Message(Message.Type.PEER_LIST, null, null);
         List<String> list = new ArrayList<>();
         for (Map.Entry<String, List<String>> entry : peerFileMap.entrySet()) {
+            if (entry.getKey().equals(peerId)) {
+                continue; // Ignora o próprio peer
+            }
             list.add(entry.getKey() + "|" + String.join(",", entry.getValue()));
         }
         response.pieces = list;
