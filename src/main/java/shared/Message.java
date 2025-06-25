@@ -4,12 +4,15 @@ import java.io.Serializable;
 import java.util.List;
 
 public class Message implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     public enum Type {
         REQUEST_PEERS, PEER_LIST, REQUEST_PIECE, FILE_RESPONSE, FILE_UPDATE, SEND_PIECE
     }
 
     public Type type;
     public String peerAddress;
+    public FilePiece sharedFilePiece;
     public List<String> pieces;
     public String requestedPiece;
 
@@ -24,5 +27,12 @@ public class Message implements Serializable {
         this.type = type;
         this.peerAddress = peerAddress;
         this.pieces = pieces;
+    }
+
+    public Message(Type type, String peerAddress, List<String> pieces, FilePiece sharedFilePiece) {
+        this.type = type;
+        this.peerAddress = peerAddress;
+        this.pieces = pieces;
+        this.sharedFilePiece = sharedFilePiece;
     }
 }

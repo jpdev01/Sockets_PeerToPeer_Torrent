@@ -13,18 +13,20 @@ public class Peer {
     private ArrayList<String> myPieces;
     private final int trackerPort = 8888;
     private final String trackerHost = "localhost"; // IP DO TRACKER
-    private final PeerTCPHandler tcpHandler;
+    private final TCPHandler tcpHandler;
     private final UDPHandler udpHandler;
+    private final String folderName;
 
-    public Peer(String id, List<String> pieces) {
+    public Peer(String id, String folderName) {
         this.id = id;
-        this.myPieces = new ArrayList<>(pieces);
-        this.tcpHandler = new PeerTCPHandler(id, myPieces);
+        this.myPieces = new ArrayList<>(Objects.requireNonNull(FileManager.loadPieceNames(folderName)));
+        this.folderName = folderName;
+        this.tcpHandler = new TCPHandler(id, this.folderName, myPieces);
         this.udpHandler = new UDPHandler(trackerHost, trackerPort);
     }
 
     public void start() throws Exception {
-        tcpHandler.startTCPServer(); // Inicia o servidor TCP
+        tcpHandler.startTCPServer();
         startRequestPeersScheduler();
         startFileUpdateThread();
     }
