@@ -89,17 +89,15 @@ public class Peer {
     }
 
     private void startFileUpdateThread() {
-        new Timer().scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    Message update = new Message(Message.Type.FILE_UPDATE, id, myPieces);
-                    udpHandler.send(update, false);
-                    System.out.println("[Peer] Lista de pedaços enviada ao tracker.");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(() -> {
+            try {
+                Message update = new Message(Message.Type.FILE_UPDATE, id, myPieces);
+                udpHandler.send(update, false);
+                System.out.println("[Peer] Lista de pedaços enviada ao tracker.");
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, 0, TimeUnit.SECONDS.toMillis(3));
+        }, 0, 3, TimeUnit.SECONDS);
     }
 }
