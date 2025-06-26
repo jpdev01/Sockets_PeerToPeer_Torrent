@@ -45,13 +45,20 @@ public class Main {
 
     private static String getFolderName(String[] args) {
         if (args.length > 1) {
-            return args[1];
+            String folderName = args[1];
+            return createFolderIfNecessary(folderName);
         } else {
-            boolean folderExists = new File("./torrent-files").isDirectory();
-            if (!folderExists) {
-                new File("./torrent-files").mkdirs();
-            }
-            return "./torrent-files";
+            final String defaultFolder = "./torrent-files";
+            return createFolderIfNecessary(defaultFolder);
         }
+    }
+
+    private static String createFolderIfNecessary(String folderName) {
+        File folder = new File(folderName);
+        if (!folder.exists()) {
+            boolean created = folder.mkdirs();
+            System.err.println("Falha ao criar a pasta: " + folderName);
+        }
+        return folderName;
     }
 }
