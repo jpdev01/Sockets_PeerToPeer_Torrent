@@ -1,6 +1,7 @@
 package peer;
 
 import java.net.Inet4Address;
+import java.util.Scanner;
 
 public class Main {
 
@@ -13,9 +14,26 @@ public class Main {
             port = "5001";
         }
         String peerId = Inet4Address.getLocalHost().getHostAddress().concat(":").concat(args[0]);
-
         String folderName = args[1];
+
+        resolveTrackerIp();
+
         Peer peer = new Peer(peerId, folderName);
         peer.start();
+    }
+
+    private static void resolveTrackerIp() {
+        System.out.println("Insira o IP do Tracker:");
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            String input = scanner.nextLine().trim();
+
+            if (IpValidator.isValid(input)) {
+                TrackerConstants.HOST = input;
+                break;
+            } else {
+                System.out.println("Endereço IP inválido. Tente novamente. Exemplo: 192.168.0.1");
+            }
+        }
     }
 }
