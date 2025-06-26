@@ -36,3 +36,8 @@ Exemplo:
 ```bash
 java -cp target/Sockets_PeerToPeer_Torrent-1.0-SNAPSHOT.jar peer.Main 5001 pieces
 ```
+
+Para verificar as conexões ativas, utilize o comando:
+```bash
+netstat -tunp
+```
