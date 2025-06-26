@@ -7,7 +7,7 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        // args[0] = nome do peer (ex: "127.0.0.1:5001")
+        // args[0] = nome do peer (ex: "5001")
         // args[1...] = pasta de pedaços
 
         String peerId = getPeerId(args);
@@ -49,7 +49,6 @@ public class Main {
         } else {
             boolean folderExists = new File("./torrent-files").isDirectory();
             if (!folderExists) {
-                System.out.println("A pasta './torrent-files' não existe. Criando pasta...");
                 new File("./torrent-files").mkdirs();
             }
             return "./torrent-files";
