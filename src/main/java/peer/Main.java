@@ -57,7 +57,7 @@ public class Main {
         File folder = new File(folderName);
         if (!folder.exists()) {
             boolean created = folder.mkdirs();
-            System.err.println("Falha ao criar a pasta: " + folderName);
+            if (!created) System.err.println("Falha ao criar a pasta: " + folderName);
         }
         return folderName;
     }
