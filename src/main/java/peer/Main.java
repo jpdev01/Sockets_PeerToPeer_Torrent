@@ -1,7 +1,10 @@
 package peer;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.Inet4Address;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.Scanner;
 
 public class Main {
@@ -39,7 +42,9 @@ public class Main {
         boolean mustUseDefaultPort = port == null || port.isEmpty() || !port.matches("\\d+");
         if (mustUseDefaultPort) port = "5001";
 
-        String peerId = Inet4Address.getLocalHost().getHostAddress().concat(":").concat(port);
+        String localAddress = getIp().toString().replace("\\/", "");
+        String peerId = localAddress.concat(":").concat(port);
+        System.out.println("[PEER MAIN], IP= " + peerId);
         return peerId;
     }
 
@@ -60,5 +65,14 @@ public class Main {
             if (!created) System.err.println("Falha ao criar a pasta: " + folderName);
         }
         return folderName;
+    }
+
+    private static String getIp() {
+        try (Socket socket = new Socket()) {
+            socket.connect(new InetSocketAddress("google.com", 80));
+            return socket.getLocalAddress().getHostAddress();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

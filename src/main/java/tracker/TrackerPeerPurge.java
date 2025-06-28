@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TrackerPeerPurge {
 
-    private static final long PEER_TIMEOUT_MS = TimeUnit.SECONDS.toMillis(10);
+    private static final long PEER_TIMEOUT_MS = TimeUnit.SECONDS.toMillis(5);
     private static final Map<String, Long> peerLastUpdateMap = new ConcurrentHashMap<>();
 
     public static void store(String peerId) {

@@ -13,6 +13,7 @@ public class Tracker {
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         TrackerPeerPurge.startInactivePeerChecker();
+        startDumpProcess();
 
         DatagramSocket socket = new DatagramSocket(PORT);
         System.out.println("[Tracker] Iniciado na porta " + PORT);
@@ -36,6 +37,22 @@ public class Tracker {
             peerFileMap.remove(peerId);
             System.out.println("[Tracker] Peer removido: " + peerId);
         }
+    }
+
+    private static void startDumpProcess() {
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(() -> {
+            try {
+                System.out.println("--------------------");
+                System.out.println("[Tracker] Dumping estado atual dos peers");
+                for (Map.Entry<String, List<String>> entry : peerFileMap.entrySet()) {
+                    System.out.println("[Tracker] Peer " + entry.getKey() + " -> [" + entry.getValue() + "]");
+                }
+                System.out.println("--------------------");
+            } catch (Exception e) {
+                System.err.println("[Tracker] Erro ao fazer dump: " + e.getMessage());
+            }
+        }, 0, 10, TimeUnit.SECONDS);
     }
 
     private static void handlePacket(DatagramPacket packet, DatagramSocket socket) throws IOException, ClassNotFoundException {
