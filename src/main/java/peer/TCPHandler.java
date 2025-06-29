@@ -16,6 +16,11 @@ public class TCPHandler {
         this.fileManager = fileManager;
     }
 
+    /* O método acceptConnections inicia um servidor TCP que aceita conexões de outros peers.
+     * Ele escuta na porta especificada pelo peerTcpAddress e processa solicitações de pedaços de arquivo.
+     * Quando uma solicitação de pedaço é recebida, ele verifica se o pedaço está disponível no disco.
+     * Se estiver, ele lê o pedaço do disco e o envia de volta ao peer solicitante.
+     */
     public void acceptConnections() {
         new Thread(() -> {
             try (ServerSocket serverSocket = new ServerSocket(getPortFromId(peerTcpAddress))) {
@@ -53,6 +58,9 @@ public class TCPHandler {
         }).start();
     }
 
+    /* O método requestPieceFromPeer solicita um pedaço de arquivo de outro peer.
+    Ele estabelece uma conexão TCP com o peer especificado, envia uma solicitação de pedaço
+     */
     public void requestPieceFromPeer(String peerInfo, String piece) {
         String[] peerParts = peerInfo.split(":");
         String peerHost = peerParts[0];

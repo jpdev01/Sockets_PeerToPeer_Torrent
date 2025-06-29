@@ -29,6 +29,12 @@ public class Peer {
         scheduler.scheduleAtFixedRate(this::executePeersPolling, 0, 3, TimeUnit.SECONDS);
     }
 
+    /*
+     * Solicita a lista de peers ao tracker e processa a resposta.
+     * A lista de peers é usada para determinar qual pedaço mais raro solicitar.
+     * Se o pedaço mais raro for encontrado, solicita-o ao peer correspondente.
+     * Também escolhe aleatoriamente outro peer da lista para potencialmente solicitar outro pedaço.
+     */
     private void executePeersPolling() {
         try {
             Message request = new Message(Message.Type.REQUEST_PEERS, tcpAddress, null);
@@ -40,9 +46,9 @@ public class Peer {
                 System.out.println(">> " + entry);
             }
 
-            RarestPieceVO rarestPieceVO = new RarestPieceVO(peerList, fileManager);
-            String rarestPiece = rarestPieceVO.piece;
-            String rarestPieceOwner = rarestPieceVO.peer;
+            PeerCollection peerCollection = new PeerCollection(peerList, fileManager);
+            String rarestPiece = peerCollection.rarestPiece;
+            String rarestPieceOwner = peerCollection.rarestPieceOwner;
 
             if (rarestPiece != null) {
                 System.out.println("[Peer] Pedaço mais raro: " + rarestPiece);
@@ -53,14 +59,33 @@ public class Peer {
                 // Escolhe aleatoriamente outro peer
                 String randomPeer = peerList.get((int) (Math.random() * peerList.size())).split("\\|")[0];
                 System.out.println("[Peer] Escolhendo outro peer aleatoriamente: " + randomPeer);
+
+                // Solicita outro pedaço ao peer aleatório
+                peerCollection.pieceToPeer.forEach((piece, peer) -> {
+                    if (!fileManager.loadPieceNames().contains(piece)) {
+                        System.out.println("[Peer] Solicitando pedaço aleatorio " + piece + " de " + peer);
+                        tcpHandler.requestPieceFromPeer(peer, piece);
+                    }
+                });
             } else {
                 System.out.println("[Peer] Todos os pedaços já presentes ou lista de peers insuficiente.");
-            }   
+            }
+
+            peerCollection.pieceToPeer.forEach((piece, peer) -> {
+                if (!fileManager.loadPieceNames().contains(piece)) {
+                    System.out.println("[Peer] Solicitando pedaço aleatorio " + piece + " de " + peer);
+                    tcpHandler.requestPieceFromPeer(peer, piece);
+                }
+            });
         } catch (Exception e) {
             System.err.println("[Peer] Erro ao solicitar peers: " + e.getMessage());
         }
     }
 
+    /*
+     * Envia uma atualização ao tracker com a lista de pedaços disponíveis.
+     * Essa atualização é enviada a cada 3 segundos para manter o tracker informado sobre os arquivos que o peer possui
+     */
     private void sendTrackerUpdate() {
         try {
             Message update = new Message(Message.Type.FILE_UPDATE, tcpAddress, fileManager.loadPieceNames());
