@@ -37,7 +37,7 @@ public class Peer {
 
             List<String> peerList = response.pieces;
             for (String entry : peerList) {
-                System.out.println(" → " + entry);
+                System.out.println(">> " + entry);
             }
 
             RarestPieceVO rarestPieceVO = new RarestPieceVO(peerList, fileManager);
