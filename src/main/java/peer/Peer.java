@@ -59,14 +59,6 @@ public class Peer {
                 // Escolhe aleatoriamente outro peer
                 String randomPeer = peerList.get((int) (Math.random() * peerList.size())).split("\\|")[0];
                 System.out.println("[Peer] Escolhendo outro peer aleatoriamente: " + randomPeer);
-
-                // Solicita outro pedaço ao peer aleatório
-                peerCollection.pieceToPeer.forEach((piece, peer) -> {
-                    if (!fileManager.loadPieceNames().contains(piece)) {
-                        System.out.println("[Peer] Solicitando pedaço aleatorio " + piece + " de " + peer);
-                        tcpHandler.requestPieceFromPeer(peer, piece);
-                    }
-                });
             } else {
                 System.out.println("[Peer] Todos os pedaços já presentes ou lista de peers insuficiente.");
             }

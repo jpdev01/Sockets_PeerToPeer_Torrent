@@ -9,6 +9,9 @@ import java.util.Scanner;
 
 public class Main {
 
+    /*
+        * Classe principal do Peer. Inicia o Peer e solicita o IP do Tracker.
+     */
     public static void main(String[] args) throws Exception {
         // args[0] = nome do peer (ex: "5001")
         // args[1...] = pasta de pedaços

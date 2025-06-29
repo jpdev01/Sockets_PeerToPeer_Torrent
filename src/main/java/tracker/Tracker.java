@@ -11,6 +11,9 @@ public class Tracker {
     private static final int PORT = 8888;
     private static final Map<String, List<String>> peerFileMap = new ConcurrentHashMap<>();
 
+    /*
+        * Método principal que inicia o tracker e escuta pacotes UDP.
+     */
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         TrackerPeerPurge.startInactivePeerChecker();
         startDumpProcess();
@@ -32,6 +35,9 @@ public class Tracker {
         }
     }
 
+    /*
+     * Remove um peer do tracker.
+     */
     public static void removePeer(String peerId) {
         if (peerFileMap.containsKey(peerId)) {
             peerFileMap.remove(peerId);
@@ -39,6 +45,9 @@ public class Tracker {
         }
     }
 
+    /*
+     * Inicia um processo agendado que faz dump do estado atual dos peers a cada 10 segundos.
+     */
     private static void startDumpProcess() {
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(() -> {
@@ -55,6 +64,11 @@ public class Tracker {
         }, 0, 10, TimeUnit.SECONDS);
     }
 
+    /*
+        * Processa o pacote recebido, decodificando a mensagem e tratando-a de acordo com seu tipo.
+        * Se for uma solicitação de peers, envia a lista de peers disponíveis.
+        * Se for uma atualização de arquivo, atualiza a lista de pedaços do peer.
+     */
     private static void handlePacket(DatagramPacket packet, DatagramSocket socket) throws IOException, ClassNotFoundException {
         ByteArrayInputStream bais = new ByteArrayInputStream(packet.getData(), 0, packet.getLength());
         ObjectInputStream ois = new ObjectInputStream(bais);
@@ -69,6 +83,11 @@ public class Tracker {
         }
     }
 
+    /*
+     * Trata a solicitação de peers, enviando a lista de peers disponíveis para o peer solicitante.
+     * Ignora o próprio peer na lista de resposta.
+     * A lista é enviada como uma mensagem serializada via UDP.
+     */
     private static void handleRequestPeers(String peerId, Message message, DatagramSocket socket, DatagramPacket packet) throws IOException {
         System.out.println("[Tracker] Enviando lista de peers para " + peerId);
 
@@ -93,6 +112,11 @@ public class Tracker {
         socket.send(responsePacket);
     }
 
+    /*
+     * Trata a atualização de arquivo, armazenando os pedaços disponíveis do peer.
+     * Se o peer já estiver registrado, atualiza sua lista de pedaços.
+     * Caso contrário, adiciona o peer com seus pedaços.
+     */
     private static void handleFileUpdate(String peerId, Message msg) {
         TrackerPeerPurge.store(msg.peerTcpAddress);
 

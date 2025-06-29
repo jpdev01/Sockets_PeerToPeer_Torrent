@@ -16,6 +16,9 @@ public class TrackerPeerPurge {
         peerLastUpdateMap.put(peerId, System.currentTimeMillis());
     }
 
+    /*
+        * Inicia um processo agendado que verifica periodicamente os peers inativos.
+     */
     public static void startInactivePeerChecker() {
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(() -> {
