@@ -70,7 +70,6 @@ public class TCPHandler {
             if (response.type == Message.Type.SEND_PIECE) {
                 System.out.println("[TCPHandler] Pedaço " + piece + " recebido de " + peerInfo);
                 fileManager.saveFile(response.sharedFilePiece);
-                // myPieces.add(response.sharedFilePiece.getName());
             }
         } catch (Exception e) {
             System.err.println("[TCPHandler] Erro ao solicitar pedaço de " + peerInfo + ": " + e.getMessage());

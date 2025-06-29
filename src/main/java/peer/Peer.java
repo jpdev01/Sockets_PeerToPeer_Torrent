@@ -48,33 +48,15 @@ public class Peer {
             System.out.println(" → " + entry);
         }
 
-        // Lógica para identificar o pedaço mais raro e o peer correspondente
-        Map<String, Integer> pieceFrequency = new HashMap<>();
-        Map<String, String> pieceToPeer = new HashMap<>();
-        for (String entry : peerList) {
-            String[] parts = entry.split("\\|");
-            if (parts.length < 2) continue;
-            String peerAddress = parts[0];
-            String[] pieces = parts[1].split(",");
-            for (String p : pieces) {
-                pieceFrequency.put(p, pieceFrequency.getOrDefault(p, 0) + 1);
-                pieceToPeer.putIfAbsent(p, peerAddress);
-            }
-        }
+        RarestPieceVO rarestPieceVO = new RarestPieceVO(peerList, fileManager);
+        String rarestPiece = rarestPieceVO.piece;
+        String rarestPieceOwner = rarestPieceVO.peer;
 
-        String rarest = pieceFrequency.entrySet().stream()
-                .filter(e -> !fileManager.loadPieceNames().contains(e.getKey()))
-                .min(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
-                .orElse(null);
-
-        String rarestPeer = rarest != null ? pieceToPeer.get(rarest) : null;
-
-        if (rarest != null) {
-            System.out.println("[Peer] Pedaço mais raro: " + rarest);
+        if (rarestPiece != null) {
+            System.out.println("[Peer] Pedaço mais raro: " + rarestPiece);
 
             // Solicita o pedaço mais raro ao peer
-            tcpHandler.requestPieceFromPeer(rarestPeer, rarest);
+            tcpHandler.requestPieceFromPeer(rarestPieceOwner, rarestPiece);
 
             // Escolhe aleatoriamente outro peer
             String randomPeer = peerList.get((int) (Math.random() * peerList.size())).split("\\|")[0];
