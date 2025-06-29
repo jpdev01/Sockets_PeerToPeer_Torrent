@@ -5,7 +5,6 @@ import shared.Message;
 
 import java.io.*;
 import java.net.*;
-import java.util.List;
 
 public class TCPHandler {
 
@@ -17,7 +16,7 @@ public class TCPHandler {
         this.fileManager = fileManager;
     }
 
-    public void startTCPServer() {
+    public void acceptConnections() {
         new Thread(() -> {
             try (ServerSocket serverSocket = new ServerSocket(getPortFromId(peerTcpAddress))) {
                 System.out.println("[TCPHandler] Servidor TCP iniciado na porta " + getPortFromId(peerTcpAddress));
