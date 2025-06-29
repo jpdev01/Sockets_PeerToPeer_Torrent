@@ -94,7 +94,7 @@ public class Tracker {
     }
 
     private static void handleFileUpdate(String peerId, Message msg) {
-        TrackerPeerPurge.store(peerId);
+        TrackerPeerPurge.store(msg.peerTcpAddress);
 
         peerFileMap.put(msg.peerTcpAddress, new ArrayList<>(msg.pieces));
         System.out.println("[Tracker] Atualizado: " + msg.peerTcpAddress + " com pedaços " + msg.pieces);
