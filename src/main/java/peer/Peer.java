@@ -10,14 +10,12 @@ import java.util.concurrent.TimeUnit;
 public class Peer {
 
     private String tcpAddress;
-     //private ArrayList<String> myPieces;
     private final FileManager fileManager;
     private final TCPHandler tcpHandler;
     private final UDPHandler udpHandler;
 
     public Peer(String id, String folderName) {
         this.tcpAddress = id;
-        // this.myPieces = new ArrayList<>(Objects.requireNonNull(FileManager.loadPieceNames(folderName)));
         this.fileManager = new FileManager(folderName);
         this.tcpHandler = new TCPHandler(id, fileManager);
         this.udpHandler = new UDPHandler();

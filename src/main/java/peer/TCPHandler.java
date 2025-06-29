@@ -49,7 +49,7 @@ public class TCPHandler {
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("[TCPHandler] Erro ao iniciar o servidor TCP: " + e.getMessage());
             }
         }).start();
     }

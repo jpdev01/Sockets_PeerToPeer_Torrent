@@ -95,10 +95,6 @@ public class Tracker {
 
     private static void handleFileUpdate(String peerId, Message msg) {
         TrackerPeerPurge.store(peerId);
-        if (msg.pieces == null || msg.pieces.isEmpty()) {
-            System.out.println("[Tracker] Atualização ignorada: lista de pedaços vazia para " + msg.peerTcpAddress);
-            return;
-        }
 
         peerFileMap.put(msg.peerTcpAddress, new ArrayList<>(msg.pieces));
         System.out.println("[Tracker] Atualizado: " + msg.peerTcpAddress + " com pedaços " + msg.pieces);
